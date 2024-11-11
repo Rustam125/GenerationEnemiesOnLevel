@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -6,7 +7,7 @@ namespace LocalAssets.Scripts
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] private List<Spawn> _spawns;
+        [SerializeField] private List<Transform> _spawns;
         [SerializeField] private Enemy _enemyPrefab;
         
         private const float MinMovementDirection = 0.005f;
@@ -14,7 +15,8 @@ namespace LocalAssets.Scripts
         
         private const float RepeatRate = 2f;
         private ObjectPool<Enemy> _enemiesPool;
-        
+        private Coroutine _coroutine;
+
         private void Awake()
         {
             _enemiesPool = new ObjectPool<Enemy>(
@@ -25,10 +27,16 @@ namespace LocalAssets.Scripts
         
         private void Start()
         {
-            InvokeRepeating(nameof(Spawn), 0f, RepeatRate);
+            _coroutine = StartCoroutine(Spawn(RepeatRate));
         }
         
-        private void Spawn()
+        private void OnDestroy()
+        {
+            if (_coroutine != null)
+                StopCoroutine(_coroutine);
+        }
+        
+        private void GetEnemy()
         {
             _enemiesPool.Get();
         }
@@ -40,10 +48,20 @@ namespace LocalAssets.Scripts
         
         private Vector3 GetRandomSpawnPosition() => _spawns[Random.Range(0, _spawns.Count)].transform.position;
         
-        private static Vector3 GetRandomMovementDirection() => new(
+        private Vector3 GetRandomMovementDirection() => new(
             Random.Range(MinMovementDirection, MaxMovementDirection),
             0f,
             Random.Range(MinMovementDirection, MaxMovementDirection));
-
+        
+        private IEnumerator Spawn(float delay)
+        {
+            var wait = new WaitForSeconds(delay);
+            
+            while (enabled)
+            {
+                GetEnemy();
+                yield return wait;
+            }
+        }
     }
 }

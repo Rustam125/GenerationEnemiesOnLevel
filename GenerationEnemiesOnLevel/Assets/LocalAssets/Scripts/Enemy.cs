@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace LocalAssets.Scripts
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class Enemy : MonoBehaviour
     {
         [SerializeField] private Animator _animator;
@@ -10,15 +11,6 @@ namespace LocalAssets.Scripts
 
         private Rigidbody _rigidbody;
         private Vector3 _movementDirection;
-        
-        public void Init(Vector3 position, Vector3 movementDirection)
-        {
-            _movementDirection = movementDirection;
-            _rigidbody.velocity = Vector3.zero;
-
-            transform.position = position;
-            gameObject.SetActive(true);
-        }
         
         private void Awake()
         {
@@ -30,6 +22,15 @@ namespace LocalAssets.Scripts
         {
             RotateToMovementDirection();
             Move();
+        }
+        
+        public void Init(Vector3 position, Vector3 movementDirection)
+        {
+            _movementDirection = movementDirection;
+            _rigidbody.velocity = Vector3.zero;
+
+            transform.position = position;
+            gameObject.SetActive(true);
         }
 
         private void Move()
