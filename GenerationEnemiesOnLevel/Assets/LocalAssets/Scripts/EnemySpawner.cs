@@ -12,8 +12,8 @@ namespace LocalAssets.Scripts
         
         private const float MinMovementDirection = 0.005f;
         private const float MaxMovementDirection = 0.009f;
-        
         private const float RepeatRate = 2f;
+        
         private ObjectPool<Enemy> _enemiesPool;
         private Coroutine _coroutine;
 
@@ -46,12 +46,13 @@ namespace LocalAssets.Scripts
             enemy.Init(GetRandomSpawnPosition(), GetRandomMovementDirection());
         }
         
-        private Vector3 GetRandomSpawnPosition() => _spawns[Random.Range(0, _spawns.Count)].transform.position;
+        private Vector3 GetRandomSpawnPosition() =>
+            _spawns[Random.Range(0, _spawns.Count)].transform.position;
         
-        private Vector3 GetRandomMovementDirection() => new(
-            Random.Range(MinMovementDirection, MaxMovementDirection),
-            0f,
-            Random.Range(MinMovementDirection, MaxMovementDirection));
+        private Vector3 GetRandomMovementDirection() =>
+            new(Random.Range(MinMovementDirection, MaxMovementDirection),
+                0f,
+                Random.Range(MinMovementDirection, MaxMovementDirection));
         
         private IEnumerator Spawn(float delay)
         {
