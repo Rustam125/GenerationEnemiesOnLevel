@@ -21,7 +21,7 @@ namespace LocalAssets.Scripts
         {
             _enemiesPool = new ObjectPool<Enemy>(
                 createFunc: () => Instantiate(_enemyPrefab, transform),
-                actionOnGet: GetEnemy,
+                actionOnGet: InitEnemy,
                 actionOnDestroy: Destroy);
         }
         
@@ -36,12 +36,7 @@ namespace LocalAssets.Scripts
                 StopCoroutine(_coroutine);
         }
         
-        private void GetEnemy()
-        {
-            _enemiesPool.Get();
-        }
-        
-        private void GetEnemy(Enemy enemy)
+        private void InitEnemy(Enemy enemy)
         {
             enemy.Init(GetRandomSpawnPosition(), GetRandomMovementDirection());
         }
@@ -60,7 +55,7 @@ namespace LocalAssets.Scripts
             
             while (enabled)
             {
-                GetEnemy();
+                _enemiesPool.Get();
                 yield return wait;
             }
         }
