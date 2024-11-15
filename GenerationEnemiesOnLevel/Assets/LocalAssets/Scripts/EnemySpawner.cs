@@ -7,20 +7,19 @@ namespace LocalAssets.Scripts
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] private List<Transform> _spawns;
-        [SerializeField] private Enemy _enemyPrefab;
+        [SerializeField] private List<SpawnPoint> _spawns;
         
-        private const float MinMovementDirection = 0.005f;
-        private const float MaxMovementDirection = 0.009f;
         private const float RepeatRate = 2f;
         
         private ObjectPool<Enemy> _enemiesPool;
         private Coroutine _coroutine;
+        private SpawnPoint _currentSpawn;
 
         private void Awake()
         {
+            _currentSpawn = GetRandomSpawnPoint();
             _enemiesPool = new ObjectPool<Enemy>(
-                createFunc: () => Instantiate(_enemyPrefab, transform),
+                createFunc: () => Instantiate(_currentSpawn.EnemyPrefab, transform),
                 actionOnGet: InitEnemy,
                 actionOnDestroy: Destroy);
         }
@@ -38,17 +37,13 @@ namespace LocalAssets.Scripts
         
         private void InitEnemy(Enemy enemy)
         {
-            enemy.Init(GetRandomSpawnPosition(), GetRandomMovementDirection());
+            enemy.Init(_currentSpawn.Position, _currentSpawn.Target);
+            _currentSpawn = GetRandomSpawnPoint();
         }
         
-        private Vector3 GetRandomSpawnPosition() =>
-            _spawns[Random.Range(0, _spawns.Count)].transform.position;
-        
-        private Vector3 GetRandomMovementDirection() =>
-            new(Random.Range(MinMovementDirection, MaxMovementDirection),
-                0f,
-                Random.Range(MinMovementDirection, MaxMovementDirection));
-        
+        private SpawnPoint GetRandomSpawnPoint() =>
+            _spawns[Random.Range(0, _spawns.Count)];
+
         private IEnumerator Spawn(float delay)
         {
             var wait = new WaitForSeconds(delay);
